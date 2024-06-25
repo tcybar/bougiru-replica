@@ -10,7 +10,8 @@
     "test": "vitest watch",
     "coverage": "vitest run --coverage",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -29,11 +30,13 @@
     "@vitejs/plugin-react-swc": "^3.5.0",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.3",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "globals": "^15.6.0",
     "happy-dom": "^14.12.3",
+    "prettier": "^3.3.2",
     "typescript": "5.4.5",
     "typescript-eslint": "^7.13.1",
     "vite": "^5.3.1",
