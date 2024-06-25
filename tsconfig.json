@@ -7,5 +7,14 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+
+  // TODO: tsconfig.app.jsonにも同じ記載があるので、どうにかしたい
+  "compilerOptions": {
+    /* import alias */
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
 }
