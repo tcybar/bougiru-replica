@@ -1,5 +1,9 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { BattleCharacter } from '@/features/Battle/models/BattleCharacter';
 import { actionType } from '@/lib/master/const';
+import { useEffect, useState } from 'react';
+
+const MAX_TURN = 20;
 
 type Action = {
   actionNo: number;
@@ -7,6 +11,7 @@ type Action = {
   actionType: number;
   target: string;
   damage: number;
+  isDead: boolean;
 };
 
 type Result = {
@@ -15,46 +20,67 @@ type Result = {
 };
 
 const BattleResult = () => {
-  const results: Result[] = [
-    {
-      turn: 1,
-      action: [
-        {
-          actionNo: 1,
-          actioner: '勇者',
-          actionType: 0,
-          target: 'モンスター',
-          damage: 10,
-        },
-        {
-          actionNo: 2,
-          actioner: 'モンスター',
-          actionType: 0,
-          target: '勇者',
-          damage: 10,
-        },
-      ],
-    },
-    {
-      turn: 2,
-      action: [
-        {
-          actionNo: 1,
-          actioner: '勇者',
-          actionType: 0,
-          target: 'モンスター',
-          damage: 10,
-        },
-        {
-          actionNo: 2,
-          actioner: 'モンスター',
-          actionType: 0,
-          target: '勇者',
-          damage: 10,
-        },
-      ],
-    },
-  ];
+  const [results, setResults] = useState<Result[]>([]);
+
+  useEffect(() => {
+    execBattle();
+  }, []);
+
+  const execBattle = () => {
+    const tmpResults: Result[] = [];
+
+    const playerCharacter = new BattleCharacter('勇者', 100);
+    const enemyCharacter = new BattleCharacter('モンスター', 100);
+
+    let turn = 1;
+    while (
+      !playerCharacter.IsDead() &&
+      !enemyCharacter.IsDead() &&
+      turn <= MAX_TURN
+    ) {
+      const actions: Action[] = [];
+
+      // ===== 勇者の攻撃 =====
+      const playerActionType = 0;
+      const playerDamage = 10;
+      enemyCharacter.ReceiveDamage(playerDamage);
+      const playerAction: Action = {
+        actionNo: turn,
+        actioner: playerCharacter.name,
+        actionType: playerActionType,
+        target: enemyCharacter.name,
+        damage: playerDamage,
+        isDead: enemyCharacter.IsDead(),
+      };
+      actions.push(playerAction);
+      // =====================
+
+      // ===== モンスターの攻撃 =====
+      const enemyActionType = 0;
+      const enemyDamage = 10;
+      playerCharacter.ReceiveDamage(enemyDamage);
+      const enemyAction: Action = {
+        actionNo: turn,
+        actioner: enemyCharacter.name,
+        actionType: enemyActionType,
+        target: playerCharacter.name,
+        damage: enemyDamage,
+        isDead: playerCharacter.IsDead(),
+      };
+      actions.push(enemyAction);
+      // =====================
+
+      const tmpResult: Result = {
+        turn: turn,
+        action: actions,
+      };
+      tmpResults.push(tmpResult);
+
+      turn++;
+    }
+
+    setResults(tmpResults);
+  };
 
   return (
     <>
@@ -68,11 +94,14 @@ const BattleResult = () => {
                 className={`m-2 ${action.actioner === '勇者' ? 'bg-gray-700' : 'text-right  bg-gray-900'}`}
               >
                 <CardHeader>
-                  {action.actioner}の{actionType[action.actionType].name}
+                  {action.actioner}の{actionType[action.actionType].label}
                 </CardHeader>
                 <CardContent>
                   <p>
                     {action.target}に{action.damage}のダメージを与えた。
+                    {action.isDead && (
+                      <p>{action.target}は戦闘不能になった。</p>
+                    )}
                   </p>
                 </CardContent>
               </Card>
@@ -81,60 +110,6 @@ const BattleResult = () => {
         </Card>
       ))}
     </>
-
-    // <div>
-    //   <h1>BattleResult</h1>
-    //   <Card className="max-w-[500px]">
-    //     <CardHeader>
-    //       1ターン目
-    //       <Card className="m-2">
-    //         <CardHeader>状況</CardHeader>
-    //         <CardContent>
-    //           <p>勇者 HP: 100</p>
-    //           <p>モンスター HP: 100</p>
-    //         </CardContent>
-    //       </Card>
-    //     </CardHeader>
-    //     <CardContent>
-    //       <Card className="m-2 bg-gray-700">
-    //         <CardHeader>勇者の{actionType[0].name}</CardHeader>
-    //         <CardContent>
-    //           <p>モンスターに10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //       <Card className="m-2 text-right bg-gray-900">
-    //         <CardHeader>モンスターの通常攻撃</CardHeader>
-    //         <CardContent>
-    //           <p>勇者に10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //       <Card className="m-2 bg-gray-700">
-    //         <CardHeader>勇者の通常攻撃</CardHeader>
-    //         <CardContent>
-    //           <p>モンスターに10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //       <Card className="m-2 text-right bg-gray-900">
-    //         <CardHeader>モンスターの通常攻撃</CardHeader>
-    //         <CardContent>
-    //           <p>勇者に10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //       <Card className="m-2 bg-gray-700">
-    //         <CardHeader>勇者の通常攻撃</CardHeader>
-    //         <CardContent>
-    //           <p>モンスターに10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //       <Card className="m-2 text-right bg-gray-900">
-    //         <CardHeader>モンスターの通常攻撃</CardHeader>
-    //         <CardContent>
-    //           <p>勇者に10のダメージを与えた。</p>
-    //         </CardContent>
-    //       </Card>
-    //     </CardContent>
-    //   </Card>
-    // </div>
   );
 };
 

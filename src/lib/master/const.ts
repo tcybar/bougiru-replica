@@ -1,1 +1,1 @@
-export const actionType = [{ val: 0, name: '通常攻撃' }];
+export const actionType = [{ val: 0, label: '通常攻撃' }];
